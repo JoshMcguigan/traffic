@@ -3,12 +3,24 @@ extern crate serde;
 extern crate serde_json;
 extern crate keyring;
 
+extern crate chrono;
+use chrono::prelude::*;
+
 #[macro_use]
 extern crate serde_derive;
 
 #[derive(Deserialize, Debug)]
-struct Views {
+struct ViewsForTwoWeeks {
     uniques: u32,
+    count: u32,
+    views: Vec<ViewsForDay>,
+}
+
+#[derive(Deserialize, Debug)]
+struct ViewsForDay {
+    timestamp: DateTime<Utc>,
+    uniques: u32,
+    count: u32,
 }
 
 #[derive(Deserialize, Debug)]
@@ -20,7 +32,7 @@ struct Repository {
 #[derive(Debug)]
 struct RepoDetails {
     repository: Repository,
-    views: Views,
+    views: ViewsForTwoWeeks,
 }
 
 fn main() -> Result<(), reqwest::Error>{
@@ -44,7 +56,7 @@ fn main() -> Result<(), reqwest::Error>{
     let mut repo_details : Vec<RepoDetails> = vec![];
 
     for repo in repos {
-        let views : Views = client
+        let views : ViewsForTwoWeeks = client
             .get(&format!("https://api.github.com/repos/{}/traffic/views", repo.full_name))
             .basic_auth("joshmcguigan", Some(password.clone()))
             .send()?
