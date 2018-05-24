@@ -2,26 +2,13 @@ extern crate reqwest;
 extern crate serde;
 extern crate serde_json;
 extern crate keyring;
-
 extern crate chrono;
-use chrono::prelude::*;
 
 #[macro_use]
 extern crate serde_derive;
 
-#[derive(Deserialize, Debug)]
-struct ViewsForTwoWeeks {
-    uniques: u32,
-    count: u32,
-    views: Vec<ViewsForDay>,
-}
-
-#[derive(Deserialize, Debug)]
-struct ViewsForDay {
-    timestamp: DateTime<Utc>,
-    uniques: u32,
-    count: u32,
-}
+mod views;
+use views::*;
 
 #[derive(Deserialize, Debug)]
 struct Repository {
@@ -62,6 +49,7 @@ fn main() -> Result<(), reqwest::Error>{
             .send()?
             .json()?;
 
+        println!("{:?}",views);
         repo_details.push(RepoDetails { repository: repo, views });
     }
 
