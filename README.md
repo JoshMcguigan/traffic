@@ -6,7 +6,9 @@ Traffic is the easiest way to keep track of the traffic to your projects on Gith
 
 ## Setup
 
-Traffic can be installed using cargo (`cargo install`). The first time running Traffic, you will be asked to enter your Github credentials. If you have two factor authentication enabled on Github you'll need to setup a personal access token for Traffic, with the read:user and repo permissions.
+Traffic can be installed using cargo (`cargo install`). If you need to install Rust, follow [these instructions](https://www.rust-lang.org/en-US/install.html).
+
+The first time running Traffic, you will be asked to enter your Github credentials. If you have two factor authentication enabled on Github you'll need to setup a personal access token for Traffic, with the read:user and repo permissions.
 
 ## License
 
