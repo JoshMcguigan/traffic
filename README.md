@@ -10,6 +10,8 @@ Traffic can be installed using cargo (`cargo install`). If you need to install R
 
 The first time running Traffic, you will be asked to enter your Github credentials. If you have two factor authentication enabled on Github you'll need to setup a personal access token for Traffic, with the read:user and repo permissions.
 
+To clear your Github credentials, use `traffic --logout`.
+
 ## License
 
 Licensed under either of
