@@ -1,4 +1,4 @@
-# Traffic
+# Traffic [![Build Status](https://travis-ci.org/JoshMcguigan/traffic.svg?branch=master)](https://travis-ci.org/JoshMcguigan/traffic)
 
 Traffic is the easiest way to keep track of the traffic to your projects on Github. Traffic queries the Github API to build a traffic report for all of your projects.
 
