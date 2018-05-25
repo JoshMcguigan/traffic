@@ -7,6 +7,9 @@ extern crate chrono;
 #[macro_use]
 extern crate serde_derive;
 
+extern crate termion;
+use termion::{color, style};
+
 mod views;
 use views::*;
 
@@ -58,8 +61,10 @@ fn main() -> Result<(), reqwest::Error>{
     let repo_name_width = 38;
     let unique_visits_width = 30;
 
-    println!("{:<repo_name_width$}{:^unique_visits_width$}{:<}\n{:<repo_name_width$}{:^unique_visits_width$}\n",
-             "Repository Name", "Unique Visits", "Trend", "", "(last 14 days)",
+    println!("{}{:<repo_name_width$}{:^unique_visits_width$}{:<}\n{:<repo_name_width$}{:^unique_visits_width$}\n{}",
+            style::Bold,
+            "Repository Name", "Unique Visits", "Trend", "", "(last 14 days)",
+            style::Reset,
             repo_name_width=repo_name_width, unique_visits_width=unique_visits_width
     );
     for repo in repo_details {
