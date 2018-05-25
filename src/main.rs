@@ -4,14 +4,24 @@ extern crate serde_json;
 extern crate keyring;
 extern crate chrono;
 
+extern crate preferences;
+use preferences::{AppInfo, PreferencesMap, Preferences};
+
 #[macro_use]
 extern crate serde_derive;
 
 extern crate termion;
-use termion::{color, style};
+use termion::style;
+
+#[macro_use]
+extern crate structopt;
+use structopt::StructOpt;
 
 mod views;
 use views::*;
+
+use std::io;
+use std::io::Read;
 
 #[derive(Deserialize, Debug)]
 struct Repository {
@@ -25,21 +35,60 @@ struct RepoDetails {
     views: ViewsForTwoWeeks,
 }
 
+const APP_INFO: AppInfo = AppInfo{name: "traffic", author: "Josh Mcguigan"};
+const PREFS_KEY: &str = "user_prefs";
+const PREFS_KEY_USERNAME : &str = "github_username";
+
 fn main() -> Result<(), reqwest::Error>{
 
-    // TODO setup traffic to manage new password (github api key), and take username from user
-    // must first run the following command
-    // > security add-generic-password -a github-username -s traffic -w github-personal-access-token
+    #[derive(Debug, StructOpt, PartialEq)]
+    struct Opt {
+        #[structopt(long = "logout")]
+        logout: bool,
+    }
+
+    let cli_option = Opt::from_args();
+
+    let load_result = PreferencesMap::<String>::load(&APP_INFO, PREFS_KEY);
+
+    if cli_option.logout {
+        // TODO this should also remove password from keyring
+        match load_result {
+            Ok(mut preferences) => {
+                preferences.remove(PREFS_KEY_USERNAME);
+                preferences.save(&APP_INFO, PREFS_KEY).expect("Failed to logout");
+                return Ok(())
+            },
+            Err(_) => return Ok(())
+        }
+    }
+
+    let mut preferences = load_result.unwrap_or(PreferencesMap::new());
+    let github_username = preferences.get(PREFS_KEY_USERNAME)
+        .map(|x| x.to_owned())
+        .unwrap_or_else(||{
+            println!("Enter your Github username:");
+            let mut username = String::new();
+            io::stdin().read_line(&mut username);
+            let github_username = username.trim().to_owned();
+
+            preferences.insert(PREFS_KEY_USERNAME.to_owned(), github_username.clone());
+            preferences.save(&APP_INFO, PREFS_KEY).expect("Failed to save login information");
+
+            // TODO request password and set in keychain
+
+            github_username
+        });
+
     let service = "traffic";
-    let username = "joshmcguigan";
-    let keyring = keyring::Keyring::new(&service, &username);
+    let keyring = keyring::Keyring::new(&service, &github_username);
     let password = keyring.get_password().expect("Could not find password in keychain");
 
     let client = reqwest::Client::new();
 
     let repos : Vec<Repository> = client
         .get("https://api.github.com/user/repos?sort=updated&affiliation=owner")
-        .basic_auth("joshmcguigan", Some(password.clone()))
+        .basic_auth(github_username.as_str(), Some(password.clone()))
         .send()?
         .json()?;
 
@@ -48,7 +97,7 @@ fn main() -> Result<(), reqwest::Error>{
     for repo in repos {
         let views : ViewsForTwoWeeks = client
             .get(&format!("https://api.github.com/repos/{}/traffic/views", repo.full_name))
-            .basic_auth("joshmcguigan", Some(password.clone()))
+            .basic_auth(github_username.as_str(), Some(password.clone()))
             .send()?
             .json()?;
 
