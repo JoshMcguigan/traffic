@@ -1,5 +1,6 @@
 use chrono::prelude::*;
 use chrono::Duration;
+use std::fmt;
 
 #[derive(Deserialize, Debug)]
 pub struct ViewsForTwoWeeks {
@@ -26,6 +27,15 @@ pub enum Direction {
     UP, DOWN
 }
 
+impl fmt::Display for Direction {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            &Direction::UP => write!(f, "Up"),
+            &Direction::DOWN => write!(f, "Down"),
+        }
+    }
+}
+
 #[derive(PartialEq, Debug)]
 pub struct Trend {
     pub direction: Direction,
@@ -35,6 +45,14 @@ pub struct Trend {
 impl Trend {
     pub fn new(direction: Direction, duration_days: i64) -> Trend {
         Trend{ direction, duration: Duration::days(duration_days) }
+    }
+}
+
+impl fmt::Display for Trend {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let num_days = self.duration.num_days();
+        let plural = if num_days>1 {"s"} else {""};
+        write!(f, "{} {} Day{}", self.direction, num_days, plural)
     }
 }
 

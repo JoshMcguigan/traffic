@@ -49,16 +49,32 @@ fn main() -> Result<(), reqwest::Error>{
             .send()?
             .json()?;
 
-        println!("{:?}",views);
         repo_details.push(RepoDetails { repository: repo, views });
     }
 
     repo_details.retain(|repo| repo.views.uniques>0);
     repo_details.sort_by_key(| repo | -1 * (repo.views.uniques as i64) );
 
+    let repo_name_width = 38;
+    let unique_visits_width = 30;
+
+    println!("{:<repo_name_width$}{:^unique_visits_width$}{:<}\n{:<repo_name_width$}{:^unique_visits_width$}\n",
+             "Repository Name", "Unique Visits", "Trend", "", "(last 14 days)",
+            repo_name_width=repo_name_width, unique_visits_width=unique_visits_width
+    );
     for repo in repo_details {
-        println!("{} - {}", repo.repository.name, repo.views.uniques);
+        let trend = match repo.views.get_trend_uniques() {
+            Some(trend) => format!("{}", trend),
+            None => String::from("None"),
+        };
+
+        println!("{:<repo_name_width$}{:^unique_visits_width$}{}",
+                 repo.repository.name, repo.views.uniques, trend,
+                 repo_name_width=repo_name_width, unique_visits_width=unique_visits_width
+        );
     }
+
+    println!();
 
     Ok(())
 }
