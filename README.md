@@ -2,6 +2,12 @@
 
 Traffic is the easiest way to keep track of the traffic to your projects on Github. Traffic queries the Github API to build a traffic report for all of your projects.
 
+![screen shot 2018-05-25 at 3](https://user-images.githubusercontent.com/22216761/40568740-4a4f51ee-6031-11e8-814a-b895cdbf38bd.png)
+
+## Setup
+
+Traffic can be installed using cargo (`cargo install`). The first time running Traffic, you will be asked to enter your Github credentials. If you have two factor authentication enabled on Github you'll need to setup a personal access token for Traffic, with the read:user and repo permissions.
+
 ## License
 
 Licensed under either of
