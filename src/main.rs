@@ -22,7 +22,6 @@ mod views;
 use views::*;
 
 use std::io;
-use std::io::Read;
 
 #[derive(Deserialize, Debug)]
 struct Repository {
@@ -61,7 +60,7 @@ fn main() -> Result<(), reqwest::Error>{
 
                 let username = preferences.get(PREFS_KEY_USERNAME).unwrap().to_owned();
                 let keyring = keyring::Keyring::new(&service, &username);
-                keyring.delete_password();
+                let _ = keyring.delete_password();
 
                 preferences.remove(PREFS_KEY_USERNAME);
                 preferences.save(&APP_INFO, PREFS_KEY).expect("Failed to logout");
@@ -78,7 +77,7 @@ fn main() -> Result<(), reqwest::Error>{
         .unwrap_or_else(||{
             println!("Enter your Github username:");
             let mut buffer = String::new();
-            io::stdin().read_line(&mut buffer);
+            let _ = io::stdin().read_line(&mut buffer);
             let github_username = buffer.trim().to_owned();
 
             preferences.insert(PREFS_KEY_USERNAME.to_owned(), github_username.clone());
@@ -121,6 +120,7 @@ fn main() -> Result<(), reqwest::Error>{
     let repo_name_width = 38;
     let unique_visits_width = 30;
 
+    println!();
     println!("{}{:<repo_name_width$}{:^unique_visits_width$}{:<}\n{:<repo_name_width$}{:^unique_visits_width$}\n{}",
             style::Bold,
             "Repository Name", "Unique Visits", "Trend", "", "(last 14 days)",
