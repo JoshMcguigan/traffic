@@ -13,4 +13,5 @@ chrono = { version = "0.4", features = ["serde"] }
 termion = "1.5.1"
 preferences = "1.1.0"
 structopt = "0.2.8"
+rpassword = "2.0.0"
 

@@ -3,6 +3,7 @@ extern crate serde;
 extern crate serde_json;
 extern crate keyring;
 extern crate chrono;
+extern crate rpassword;
 
 extern crate preferences;
 use preferences::{AppInfo, PreferencesMap, Preferences};
@@ -51,10 +52,17 @@ fn main() -> Result<(), reqwest::Error>{
 
     let load_result = PreferencesMap::<String>::load(&APP_INFO, PREFS_KEY);
 
+    let service = "traffic";
+
     if cli_option.logout {
-        // TODO this should also remove password from keyring
+
         match load_result {
             Ok(mut preferences) => {
+
+                let username = preferences.get(PREFS_KEY_USERNAME).unwrap().to_owned();
+                let keyring = keyring::Keyring::new(&service, &username);
+                keyring.delete_password();
+
                 preferences.remove(PREFS_KEY_USERNAME);
                 preferences.save(&APP_INFO, PREFS_KEY).expect("Failed to logout");
                 return Ok(())
@@ -64,23 +72,26 @@ fn main() -> Result<(), reqwest::Error>{
     }
 
     let mut preferences = load_result.unwrap_or(PreferencesMap::new());
+
     let github_username = preferences.get(PREFS_KEY_USERNAME)
         .map(|x| x.to_owned())
         .unwrap_or_else(||{
             println!("Enter your Github username:");
-            let mut username = String::new();
-            io::stdin().read_line(&mut username);
-            let github_username = username.trim().to_owned();
+            let mut buffer = String::new();
+            io::stdin().read_line(&mut buffer);
+            let github_username = buffer.trim().to_owned();
 
             preferences.insert(PREFS_KEY_USERNAME.to_owned(), github_username.clone());
-            preferences.save(&APP_INFO, PREFS_KEY).expect("Failed to save login information");
+            preferences.save(&APP_INFO, PREFS_KEY).expect("Failed to save username");
 
-            // TODO request password and set in keychain
+            let password = rpassword::prompt_password_stdout("Enter your Github password (personal access token if 2FA is enabled):").unwrap();
+            let keyring = keyring::Keyring::new(&service, &github_username);
+            keyring.set_password(&password).expect("Failed to save password to keyring");
 
-            github_username
+            (&github_username).clone()
         });
 
-    let service = "traffic";
+
     let keyring = keyring::Keyring::new(&service, &github_username);
     let password = keyring.get_password().expect("Could not find password in keychain");
 
