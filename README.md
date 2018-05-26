@@ -6,12 +6,10 @@ Traffic is the easiest way to keep track of the traffic to your projects on Gith
 
 ## Setup
 
-Traffic can be installed using cargo. If you need to install Rust, follow [these instructions](https://www.rust-lang.org/en-US/install.html). Once you have Rust installed, follow the steps below to install Traffic:
+Traffic requires Rust in order to build/install. If you need to install Rust, follow [these instructions](https://www.rust-lang.org/en-US/install.html). Once you have Rust installed, Traffic can be installed by running the command below:
 
 ```
-git clone https://github.com/JoshMcguigan/traffic.git
-cd traffic
-cargo install
+cargo install traffic
 ```
 
 The first time running Traffic, you will be asked to enter your Github credentials. If you have two factor authentication enabled on Github you'll need to setup a personal access token for Traffic, with the read:user and repo permissions.
