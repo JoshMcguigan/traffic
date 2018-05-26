@@ -1,10 +1,12 @@
 [package]
 name = "traffic"
 version = "0.1.0"
-authors = ["Josh Mcguigan <>"]
+authors = ["Josh Mcguigan"]
+description = "Simple traffic reporting for your Github repositories"
 repository = "https://github.com/JoshMcguigan/traffic"
 readme = "README.md"
 keywords = ["github", "cli"]
+license = "MIT OR Apache-2.0"
 
 [dependencies]
 reqwest = "0.8.5"
