@@ -2,6 +2,9 @@
 name = "traffic"
 version = "0.1.0"
 authors = ["Josh Mcguigan <>"]
+repository = "https://github.com/JoshMcguigan/traffic"
+readme = "README.md"
+keywords = ["github", "cli"]
 
 [dependencies]
 reqwest = "0.8.5"
