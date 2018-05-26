@@ -72,5 +72,5 @@ fn main(){
 
     let repo_details = get_all_traffic_data(&github_username, &password);
 
-    print_to_std_out(repo_details);
+    print!("{}", get_formatted_output(repo_details));
 }
