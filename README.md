@@ -12,7 +12,7 @@ Traffic requires Rust in order to build/install. If you need to install Rust, fo
 cargo install traffic
 ```
 
-The first time running Traffic, you will be asked to enter your Github credentials. If you have two factor authentication enabled on Github you'll need to setup a personal access token for Traffic, with the read:user and repo permissions.
+The first time running Traffic, you will be asked to enter your Github credentials. If you have two factor authentication enabled on Github you'll need to setup a personal access token for Traffic, with the `read:user` and `repo` permissions.
 
 To clear your Github credentials, use `traffic --logout`.
 
