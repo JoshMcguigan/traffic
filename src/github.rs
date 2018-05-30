@@ -17,7 +17,7 @@ pub struct RepoDetails {
     pub views: ViewsForTwoWeeks,
 }
 
-pub fn get_all_traffic_data(github_username: &str, password: &str) -> Vec<RepoDetails> {
+pub fn get_all_traffic_data(username: &str, password: &str) -> Vec<RepoDetails> {
     let mut core = tokio_core::reactor::Core::new().unwrap();
     let client = Client::new(&core.handle());
 
@@ -25,7 +25,7 @@ pub fn get_all_traffic_data(github_username: &str, password: &str) -> Vec<RepoDe
         core.run(
         client
             .get("https://api.github.com/user/repos?sort=updated&affiliation=owner")
-            .basic_auth(github_username, Some(password.clone()))
+            .basic_auth(username, Some(password.clone()))
             .send()
             .and_then(|mut res : Response| {
                 res.json::<Vec<Repository>>()
@@ -37,7 +37,7 @@ pub fn get_all_traffic_data(github_username: &str, password: &str) -> Vec<RepoDe
     for repo in &repos {
        let request =  client
             .get(&format!("https://api.github.com/repos/{}/traffic/views", repo.full_name))
-            .basic_auth(github_username, Some(password.clone()))
+            .basic_auth(username, Some(password.clone()))
             .send()
             .and_then(|mut res : Response| {
                 res.json::<ViewsForTwoWeeks>()
