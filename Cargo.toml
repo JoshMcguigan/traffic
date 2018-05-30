@@ -1,6 +1,6 @@
 [package]
 name = "traffic"
-version = "0.1.1"
+version = "0.1.2"
 authors = ["Josh Mcguigan"]
 description = "Simple traffic reporting for your Github repositories"
 repository = "https://github.com/JoshMcguigan/traffic"
@@ -9,7 +9,9 @@ keywords = ["github", "cli"]
 license = "MIT OR Apache-2.0"
 
 [dependencies]
-reqwest = "0.8.5"
+reqwest = {version="0.8.5", features = ["unstable"]}
+futures = "0.1.15"
+tokio-core = "0.1.6"
 serde = "1.0"
 serde_json = "1.0"
 serde_derive = "1.0"

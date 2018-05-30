@@ -1,5 +1,9 @@
-use reqwest;
+use tokio_core;
 use views::*;
+
+use reqwest::unstable::async::{Client, Response};
+use futures::Future;
+use futures::future::join_all;
 
 #[derive(Deserialize, Debug)]
 pub struct Repository {
@@ -14,23 +18,38 @@ pub struct RepoDetails {
 }
 
 pub fn get_all_traffic_data(github_username: &str, password: &str) -> Vec<RepoDetails> {
-    let client = reqwest::Client::new();
+    let mut core = tokio_core::reactor::Core::new().unwrap();
+    let client = Client::new(&core.handle());
 
-    let repos : Vec<Repository> = client
-        .get("https://api.github.com/user/repos?sort=updated&affiliation=owner")
-        .basic_auth(github_username, Some(password.clone()))
-        .send().expect(&format!("Failed to read repository data for user {}", github_username))
-        .json().expect(&format!("Failed to parse repository data for user {}", github_username));
+    let repos =
+        core.run(
+        client
+            .get("https://api.github.com/user/repos?sort=updated&affiliation=owner")
+            .basic_auth(github_username, Some(password.clone()))
+            .send()
+            .and_then(|mut res : Response| {
+                res.json::<Vec<Repository>>()
+            })
+        ).unwrap();
+
+    let mut traffic_requests = vec![];
+
+    for repo in &repos {
+       let request =  client
+            .get(&format!("https://api.github.com/repos/{}/traffic/views", repo.full_name))
+            .basic_auth(github_username, Some(password.clone()))
+            .send()
+            .and_then(|mut res : Response| {
+                res.json::<ViewsForTwoWeeks>()
+            });
+        traffic_requests.push(request);
+    }
+
+    let work = join_all(traffic_requests);
 
     let mut repo_details : Vec<RepoDetails> = vec![];
 
-    for repo in repos {
-        let views : ViewsForTwoWeeks = client
-            .get(&format!("https://api.github.com/repos/{}/traffic/views", repo.full_name))
-            .basic_auth(github_username, Some(password.clone()))
-            .send().expect(&format!("Failed to read repository data for {}", repo.full_name))
-            .json().expect(&format!("Failed to parse repository data for {}", repo.full_name));
-
+    for (views, repo) in core.run(work).unwrap().into_iter().zip(repos.into_iter()) {
         repo_details.push(RepoDetails { repository: repo, views });
     }
 

@@ -1178,9 +1178,10 @@ dependencies = [
 
 [[package]]
 name = "traffic"
-version = "0.1.1"
+version = "0.1.2"
 dependencies = [
  "chrono 0.4.2 (registry+https://github.com/rust-lang/crates.io-index)",
+ "futures 0.1.21 (registry+https://github.com/rust-lang/crates.io-index)",
  "keyring 0.6.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "preferences 1.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "reqwest 0.8.5 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -1190,6 +1191,7 @@ dependencies = [
  "serde_json 1.0.17 (registry+https://github.com/rust-lang/crates.io-index)",
  "structopt 0.2.8 (registry+https://github.com/rust-lang/crates.io-index)",
  "termion 1.5.1 (registry+https://github.com/rust-lang/crates.io-index)",
+ "tokio-core 0.1.17 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
