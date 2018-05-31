@@ -2,7 +2,7 @@
 
 Traffic is the easiest way to keep track of the traffic to your projects on Github. Traffic queries the Github API to build a traffic report for all of your projects.
 
-![screen shot 2018-05-25 at 3](https://user-images.githubusercontent.com/22216761/40568740-4a4f51ee-6031-11e8-814a-b895cdbf38bd.png)
+![screenshot](https://user-images.githubusercontent.com/22216761/40780038-fc70cae8-648b-11e8-85b3-361a9a781461.png)
 
 ## Setup
 
