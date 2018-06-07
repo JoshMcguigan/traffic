@@ -1,8 +1,9 @@
 use github::*;
-use termion::style;
 
 const NO_REPOS_FOUND : &str = "\nNo Github repositories were found :(\n";
 const NO_TRAFFIC : &str = "\nLooks like your repos haven't had any traffic lately. Go spread the word and check back later!\n";
+const STYLE_BOLD : &str = "\x1B[1m";
+const STYLE_RESET : &str = "\x1B[0m";
 
 pub fn get_formatted_output(mut repo_details: Vec<RepoDetails>) -> String {
     if repo_details.is_empty() {
@@ -22,10 +23,22 @@ pub fn get_formatted_output(mut repo_details: Vec<RepoDetails>) -> String {
     let mut output = String::new();
 
     output += "\n";
+
+    let set_style;
+    let clear_style;
+    if cfg!(target_os = "windows") {
+        // disable ansi escape sequences on Windows because they have limited support
+        set_style = "";
+        clear_style = "";
+    } else {
+        set_style = STYLE_BOLD;
+        clear_style = STYLE_RESET;
+    }
+    
     output += &format!("{}{:<repo_name_width$}{:^unique_visits_width$}{:<}\n{:<repo_name_width$}{:^unique_visits_width$}\n{}\n",
-             style::Bold,
+             set_style,
              "Repository Name", "Unique Visits", "Trend", "", "(last 14 days)",
-             style::Reset,
+             clear_style,
              repo_name_width=repo_name_width, unique_visits_width=unique_visits_width
     );
     for repo in repo_details {

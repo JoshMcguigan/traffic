@@ -6,7 +6,6 @@ extern crate serde_json;
 extern crate keyring;
 extern crate chrono;
 extern crate rpassword;
-extern crate termion;
 #[macro_use] extern crate structopt;
 use structopt::StructOpt;
 extern crate preferences;
