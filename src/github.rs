@@ -21,16 +21,30 @@ pub fn get_all_traffic_data(username: &str, password: &str) -> Vec<RepoDetails> 
     let mut core = tokio_core::reactor::Core::new().unwrap();
     let client = Client::new(&core.handle());
 
-    let repos =
-        core.run(
-        client
-            .get("https://api.github.com/user/repos?sort=updated&affiliation=owner")
-            .basic_auth(username, Some(password.clone()))
-            .send()
-            .and_then(|mut res : Response| {
-                res.json::<Vec<Repository>>()
-            })
+    let mut repos = vec![];
+    let max_repos_per_page = 100; // this is the maximum allowed by the github api
+
+    for page in 1..=15 {
+        // request no more than 15 pages of repos
+        // github api rate limits at 5000 requests per hour
+        let mut repos_on_this_page = core.run(
+            client
+                .get(&format!("https://api.github.com/user/repos?sort=updated&affiliation=owner&per_page={}&page={}", max_repos_per_page, page))
+                .basic_auth(username, Some(password.clone()))
+                .send()
+                .and_then(|mut res : Response| {
+                    res.json::<Vec<Repository>>()
+                })
         ).unwrap();
+
+        let num_repos_on_this_page = repos_on_this_page.len();
+
+        repos.append(&mut repos_on_this_page);
+
+        if num_repos_on_this_page < max_repos_per_page {
+            break;
+        }
+    }
 
     let mut traffic_requests = vec![];
 
