@@ -1,9 +1,11 @@
-use tokio_core;
+use tokio_core::reactor::Core;
 use views::*;
 
 use reqwest::unstable::async::{Client, Response};
 use futures::Future;
 use futures::future::join_all;
+
+const MAX_REPOS_PER_PAGE: usize = 100; // this is the maximum allowed by the github api
 
 #[derive(Deserialize, Debug)]
 pub struct Repository {
@@ -18,18 +20,18 @@ pub struct RepoDetails {
 }
 
 pub fn get_all_traffic_data(username: &str, password: &str) -> Vec<RepoDetails> {
-    let mut core = tokio_core::reactor::Core::new().unwrap();
+    let mut core = Core::new().unwrap();
     let client = Client::new(&core.handle());
 
     let mut repos = vec![];
-    let max_repos_per_page = 100; // this is the maximum allowed by the github api
 
     for page in 1..=15 {
         // request no more than 15 pages of repos
         // github api rate limits at 5000 requests per hour
+        let url = format!("https://api.github.com/user/repos?sort=updated&affiliation=owner&per_page={}&page={}", MAX_REPOS_PER_PAGE, page);
         let mut repos_on_this_page = core.run(
             client
-                .get(&format!("https://api.github.com/user/repos?sort=updated&affiliation=owner&per_page={}&page={}", max_repos_per_page, page))
+                .get(&url)
                 .basic_auth(username, Some(password.clone()))
                 .send()
                 .and_then(|mut res : Response| {
@@ -41,7 +43,7 @@ pub fn get_all_traffic_data(username: &str, password: &str) -> Vec<RepoDetails> 
 
         repos.append(&mut repos_on_this_page);
 
-        if num_repos_on_this_page < max_repos_per_page {
+        if num_repos_on_this_page < MAX_REPOS_PER_PAGE {
             break;
         }
     }
