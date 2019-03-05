@@ -3,7 +3,7 @@ use views::*;
 
 use reqwest::unstable::async::{Client, Response};
 use futures::Future;
-use futures::future::join_all;
+use join_all_res::join_all;
 
 const MAX_REPOS_PER_PAGE: usize = 100; // this is the maximum allowed by the github api
 
@@ -66,7 +66,10 @@ pub fn get_all_traffic_data(username: &str, password: &str) -> Vec<RepoDetails> 
     let mut repo_details : Vec<RepoDetails> = vec![];
 
     for (views, repo) in core.run(work).unwrap().into_iter().zip(repos.into_iter()) {
-        repo_details.push(RepoDetails { repository: repo, views });
+        match views {
+            Ok(views) => repo_details.push(RepoDetails { repository: repo, views }),
+            Err(e) => eprintln!("Failed to retrieve repo data for {}: {}", repo.name, e)
+        };
     }
 
     repo_details

@@ -14,6 +14,7 @@ mod views;
 mod github;
 mod output;
 mod user;
+mod join_all_res;
 
 #[derive(Debug, StructOpt, PartialEq)]
 struct Opt {
