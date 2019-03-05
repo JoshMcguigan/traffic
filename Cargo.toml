@@ -1,6 +1,6 @@
 [package]
 name = "traffic"
-version = "0.1.4"
+version = "0.1.5"
 authors = ["Josh Mcguigan"]
 description = "Simple traffic reporting for your Github repositories"
 repository = "https://github.com/JoshMcguigan/traffic"
