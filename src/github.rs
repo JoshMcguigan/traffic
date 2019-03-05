@@ -51,11 +51,14 @@ pub fn get_all_traffic_data(username: &str, password: &str) -> Vec<RepoDetails> 
     let mut traffic_requests = vec![];
 
     for repo in &repos {
-       let request =  client
+        let request =  client
             .get(&format!("https://api.github.com/repos/{}/traffic/views", repo.full_name))
             .basic_auth(username, Some(password.clone()))
             .send()
             .and_then(|mut res : Response| {
+                if !res.status().is_success() {
+                    eprintln!("{}", res.status());
+                }
                 res.json::<ViewsForTwoWeeks>()
             });
         traffic_requests.push(request);
